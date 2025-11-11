@@ -11,6 +11,12 @@ public class GameManager : MonoBehaviour
     public int Vidas = 3;
     private int ladrillosRestantes; // Para saber cuándo ganar
     
+    [Header("Audio")]
+    [Tooltip("Arrastra aquí el clip de audio para la música de fondo.")]
+    public AudioClip musicaDeFondo;
+    [Tooltip("Sonido que se reproduce al romper un ladrillo.")]
+    public AudioClip sonidoLadrilloRoto;
+    private AudioSource audioSource;
     // Referencia al prefab de la bola
     public GameObject prefabBola;
     // Posición de inicio de la bola/paleta
@@ -29,6 +35,21 @@ public class GameManager : MonoBehaviour
         else
         {
             Instancia = this; // Se establece como la única instancia
+            DontDestroyOnLoad(gameObject); // Evita que el GameManager se destruya al cargar otra escena
+
+            // Configurar y reproducir la música de fondo
+            audioSource = GetComponent<AudioSource>();
+            if (audioSource == null) // Si no existe un AudioSource, lo añade
+            {
+                audioSource = gameObject.AddComponent<AudioSource>();
+            }
+
+            if (musicaDeFondo != null)
+            {
+                audioSource.clip = musicaDeFondo;
+                audioSource.loop = true; // Para que la música se repita
+                audioSource.Play();
+            }
         }
     }
 
@@ -58,6 +79,12 @@ public class GameManager : MonoBehaviour
     // 5. Método llamado por los ladrillos al ser destruidos
     public void LadrilloDestruido(int puntosLadrillo)
     {
+        // Reproducir sonido de ladrillo roto si está asignado
+        if (sonidoLadrilloRoto != null)
+        {
+            audioSource.PlayOneShot(sonidoLadrilloRoto);
+        }
+
         Puntuacion += puntosLadrillo;
         ladrillosRestantes--;
         
