@@ -10,9 +10,6 @@ public class DeathZone : MonoBehaviour
         {
             // 3. Informar al GameManager que se perdió una vida
             GameManager.Instancia.PerderVida();
-            
-            // 4. Destruir la bola que ha caído
-            Destroy(other.gameObject);
         }
     }
 }
