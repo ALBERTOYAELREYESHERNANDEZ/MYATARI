@@ -1,30 +1,33 @@
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody2D))] // Requerimos Rigidbody2D
 public class PaddleMovement : MonoBehaviour
 {
     public float velocidad = 10f; // Velocidad de movimiento
     public float limiteHorizontal = 8f; // Límite para que la paleta no salga de la pantalla
 
-    // 1. Update() se llama en cada frame
-    void Update()
+    private Rigidbody2D rb; // Usamos Rigidbody2D
+
+    private void Awake()
     {
-        // 2. Input del teclado (eje horizontal: flechas, A/D)
+        rb = GetComponent<Rigidbody2D>();
+        // Forzamos la configuración del Rigidbody2D para que sea Kinematic
+        rb.bodyType = RigidbodyType2D.Kinematic;
+        rb.gravityScale = 0;
+    }
+
+    // Usamos FixedUpdate para movimientos basados en física
+    private void FixedUpdate()
+    {
         float inputHorizontal = Input.GetAxis("Horizontal");
 
-        // 3. Calcular el movimiento (dirección * velocidad * tiempo)
-        // Time.deltaTime asegura que el movimiento sea independiente de la velocidad de fotogramas
-        float movimiento = inputHorizontal * velocidad * Time.deltaTime;
+        // Calculamos la nueva posición en 2D
+        Vector2 nuevaPosicion = rb.position + new Vector2(inputHorizontal, 0) * velocidad * Time.fixedDeltaTime;
 
-        // 4. Nueva posición
-        Vector3 nuevaPosicion = transform.position + new Vector3(movimiento, 0, 0);
-
-        // 5. Limitar la posición horizontal (Clamp)
+        // Limitamos la posición horizontal
         nuevaPosicion.x = Mathf.Clamp(nuevaPosicion.x, -limiteHorizontal, limiteHorizontal);
-
-        // 6. Aplicar la nueva posición
-        transform.position = nuevaPosicion;
-
-        // NOTA: Para un control más preciso con físicas (Rigidbody2D), se usaría FixedUpdate() 
-        // y se manipularía la velocidad o la posición del Rigidbody.
+        
+        // Movemos el Rigidbody a la nueva posición
+        rb.MovePosition(nuevaPosicion);
     }
 }
